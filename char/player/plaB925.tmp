@@ -1,0 +1,139 @@
+[gd_scene load_steps=26 format=3 uid="uid://cyak474765cyj"]
+
+[ext_resource type="Script" path="res://char/player/player.gd" id="1_8c7l0"]
+[ext_resource type="Script" path="res://components/move_component.gd" id="1_n386y"]
+[ext_resource type="Texture2D" uid="uid://bd2ox4dnto6qm" path="res://char/player/sprite/move/sg_fwd00.png" id="2_3ewkb"]
+[ext_resource type="Texture2D" uid="uid://bcalo4b4n814o" path="res://char/player/sprite/move/sg_fwd01.png" id="3_dgyyk"]
+[ext_resource type="Texture2D" uid="uid://xa2a7wmo1vfg" path="res://char/player/sprite/move/sg_fwd02.png" id="4_7phnm"]
+[ext_resource type="Texture2D" uid="uid://u8rweuorseit" path="res://char/player/sprite/rifle/sg_rfl00.png" id="5_8d8ki"]
+[ext_resource type="Script" path="res://char/player/Moving.gd" id="5_tbdeq"]
+[ext_resource type="Texture2D" uid="uid://600bexl8jeub" path="res://char/player/sprite/rifle/sg_rfl01.png" id="6_17odq"]
+[ext_resource type="Texture2D" uid="uid://coasc4sdmsgxk" path="res://char/player/sprite/rifle/sg_rfl02.png" id="7_tyb6x"]
+[ext_resource type="Texture2D" uid="uid://0ofe37s3vs1f" path="res://char/player/sprite/rifle/sg_rfl03.png" id="8_v6ibv"]
+[ext_resource type="Texture2D" uid="uid://cgy6lri3hum6j" path="res://char/player/sprite/rifle/sg_rfl04.png" id="9_ckxuo"]
+[ext_resource type="Texture2D" uid="uid://yhslj4c8a3bw" path="res://char/player/sprite/rifle/sg_rfl05.png" id="10_p0bp2"]
+[ext_resource type="Texture2D" uid="uid://cgegad0v41yji" path="res://char/player/sprite/stand/sg_std00.png" id="11_x0655"]
+[ext_resource type="Texture2D" uid="uid://jhcocaqswd6i" path="res://char/player/sprite/stand/sg_std01.png" id="12_1hl3f"]
+[ext_resource type="Texture2D" uid="uid://d08kiwce2mpo0" path="res://char/player/sprite/stand/sg_std02.png" id="13_7lpr2"]
+[ext_resource type="Script" path="res://components/move_input_component.gd" id="14_vkjvc"]
+[ext_resource type="Resource" uid="uid://dasqj4pgssipj" path="res://char/player/player_move_stats.tres" id="15_ydpib"]
+[ext_resource type="Script" path="res://components/spawner_component.gd" id="17_jupyg"]
+[ext_resource type="PackedScene" uid="uid://6m2wsf2hku0d" path="res://projectile/laser_projectile.tscn" id="18_plvno"]
+[ext_resource type="Script" path="res://components/shake_component.gd" id="19_rjbs0"]
+[ext_resource type="Script" path="res://char/player/player_state_machine.gd" id="20_rgihj"]
+[ext_resource type="Script" path="res://char/player/Stand.gd" id="21_0vu4n"]
+[ext_resource type="Script" path="res://char/player/Shoot.gd" id="22_ag62k"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_hyjes"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_3ewkb")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_dgyyk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_7phnm")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_dgyyk")
+}],
+"loop": true,
+"name": &"move",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_8d8ki")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_17odq")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_tyb6x")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_v6ibv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_ckxuo")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_p0bp2")
+}],
+"loop": false,
+"name": &"rifle",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_x0655")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_1hl3f")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_7lpr2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_1hl3f")
+}],
+"loop": true,
+"name": &"stand",
+"speed": 12.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_613c5"]
+size = Vector2(130, 124)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_8c7l0")
+
+[node name="FiniteStateMachine" type="Node" parent="." node_paths=PackedStringArray("current_state")]
+script = ExtResource("20_rgihj")
+current_state = NodePath("Stand")
+
+[node name="Stand" type="Node" parent="FiniteStateMachine"]
+script = ExtResource("21_0vu4n")
+
+[node name="Shoot" type="Node" parent="FiniteStateMachine"]
+script = ExtResource("22_ag62k")
+
+[node name="Moving" type="Node" parent="FiniteStateMachine"]
+script = ExtResource("5_tbdeq")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_hyjes")
+animation = &"rifle"
+autoplay = "stand"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_613c5")
+
+[node name="MoveComponent" type="Node" parent="." node_paths=PackedStringArray("actor")]
+script = ExtResource("1_n386y")
+actor = NodePath("..")
+
+[node name="MoveInputComponent" type="Node" parent="." node_paths=PackedStringArray("move_component")]
+script = ExtResource("14_vkjvc")
+move_component = NodePath("../MoveComponent")
+move_stats = ExtResource("15_ydpib")
+
+[node name="Marker2D" type="Marker2D" parent="."]
+position = Vector2(107, -9)
+
+[node name="SpawnerComponent" type="Node2D" parent="."]
+script = ExtResource("17_jupyg")
+scene = ExtResource("18_plvno")
+
+[node name="FireRateTimer" type="Timer" parent="."]
+wait_time = 0.4
+autostart = true
+
+[node name="ShakeComponent" type="Node" parent="." node_paths=PackedStringArray("node")]
+script = ExtResource("19_rjbs0")
+node = NodePath("../AnimatedSprite2D")
+shake_amount_x = 0.0
+
+[connection signal="timeout" from="FireRateTimer" to="." method="_on_fire_rate_timer_timeout"]
